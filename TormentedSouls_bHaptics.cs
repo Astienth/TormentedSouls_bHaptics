@@ -16,6 +16,7 @@ namespace TormentedSouls_bHaptics
         internal static new ManualLogSource Log;
 #pragma warning restore CS0109
         public static TactsuitVR tactsuitVr;
+        public static bool rightFootLast = true;
 
         private void Awake()
         {
@@ -36,7 +37,7 @@ namespace TormentedSouls_bHaptics
     public class bhaptics_OnPlayerDeath
     {
         [HarmonyPostfix]
-        public static void Postfix(float deathDelay)
+        public static void Postfix()
         {
             if (Plugin.tactsuitVr.suitDisabled)
             {
@@ -46,32 +47,21 @@ namespace TormentedSouls_bHaptics
             Plugin.tactsuitVr.StopHeartBeat();
         }
     }
-    
-    [HarmonyPatch(typeof(PlayerController), "ReceiveDamage")]
-    public class bhaptics_OnPlayerDamage
-    {
-        [HarmonyPostfix]
-        public static void Postfix()
-        {
-            if (Plugin.tactsuitVr.suitDisabled)
-            {
-                return;
-            }
-            Plugin.tactsuitVr.PlaybackHaptics("Impact");
-        }
-    }
 
-    [HarmonyPatch(typeof(PlayerController), "Update")]
-    public class bhaptics_OnPlayerLowHealth
+    [HarmonyPatch(typeof(GameplaySceneManager), "UpdateMainPlayerHealth")]
+    public class bhaptics_OnUpdateMainPlayerHealth
     {
         [HarmonyPostfix]
-        public static void Postfix(PlayerController __instance)
+        public static void Postfix(GameplaySceneManager __instance,  int addAmount)
         {
             if (Plugin.tactsuitVr.suitDisabled)
             {
                 return;
             }
-            if(__instance.m_characterData.CurrentHealth < __instance.m_characterData.MaximumHealth / 6)
+            //low health
+            UserDataManager userDataManager = __instance.managerRefs.userDataManager;
+            int playerHealth = (int)userDataManager.GetPlayerHealth();
+            if (playerHealth < __instance.GetSceneData().mainPlayerData.maximumHealth / 3)
             {
                 Plugin.tactsuitVr.StartHeartBeat();
             }
@@ -79,20 +69,30 @@ namespace TormentedSouls_bHaptics
             {
                 Plugin.tactsuitVr.StopHeartBeat();
             }
+            //damages
+            if (addAmount < 0)
+            {
+                Plugin.tactsuitVr.PlaybackHaptics("Impact");
+            }
+            //Heal
+            else
+            {
+                Plugin.tactsuitVr.PlaybackHaptics("Heal");
+            }
         }
     }
 
-    [HarmonyPatch(typeof(PlayerSM_Shoot), "StartDamage")]
+    [HarmonyPatch(typeof(WeaponBase), "Attack")]
     public class bhaptics_PlayerSM_Shoot
     {
         [HarmonyPostfix]
-        public static void Postfix(PlayerSM_Shoot __instance)
+        public static void Postfix(WeaponBase __instance)
         {
             if (Plugin.tactsuitVr.suitDisabled)
             {
                 return;
             }
-            int weaponType = (int)Traverse.Create(__instance).Property("m_weaponBase").GetValue<WeaponBase>().GetWeaponType();
+            int weaponType = (int)__instance.GetWeaponType();
             if (weaponType == 0)
             {
                 Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_R");
@@ -104,6 +104,29 @@ namespace TormentedSouls_bHaptics
                 Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_R");
                 Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_L");
                 Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_L");
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(PlayerStepsReceiver), "TriggerStep")]
+    public class bhaptics_OnPlayerStepsReceiver
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            if (Plugin.tactsuitVr.suitDisabled)
+            {
+                return;
+            }
+            if (Plugin.rightFootLast)
+            {
+                Plugin.rightFootLast = false;
+                Plugin.tactsuitVr.PlaybackHaptics("FootStep_L");
+            }
+            else
+            {
+                Plugin.rightFootLast = true;
+                Plugin.tactsuitVr.PlaybackHaptics("FootStep_R");
             }
         }
     }
