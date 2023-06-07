@@ -31,8 +31,8 @@ namespace TormentedSouls_bHaptics
             harmony.PatchAll();
         }
     }
-    /*
-    [HarmonyPatch(typeof(Player), "OnDestroy")]
+    
+    [HarmonyPatch(typeof(PlayerController), "OnPlayerDeath")]
     public class bhaptics_OnPlayerDestroy
     {
         [HarmonyPostfix]
@@ -42,9 +42,8 @@ namespace TormentedSouls_bHaptics
             {
                 return;
             }
-            Plugin.tactsuitVr.StopThreads();
+            Plugin.tactsuitVr.PlaybackHaptics("Death");
         }
     }
-    */
 }
 

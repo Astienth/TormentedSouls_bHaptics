@@ -67,4 +67,7 @@
     <Compile Include="TormentedSouls_bHaptics.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>call "D:\bHaptics and Devs\Tourmented souls\Dev\TormentedSouls_bHaptics\bin\copy.bat"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
