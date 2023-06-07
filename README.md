@@ -6,6 +6,15 @@
 
 This mod adds bhaptics (vest, arms and feet) support to the game
 
+# Effects
+
+Getting damages
+Shooting with weapons
+Low Health warning
+Healing
+Dying
+Foot steps while walking
+
 # Installation
 
 # IF YOU WANT TO PLAY IN VR:
