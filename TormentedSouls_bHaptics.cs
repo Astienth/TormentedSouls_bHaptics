@@ -31,7 +31,7 @@ namespace TormentedSouls_bHaptics
             harmony.PatchAll();
         }
     }
-
+    /*
     [HarmonyPatch(typeof(Player), "OnDestroy")]
     public class bhaptics_OnPlayerDestroy
     {
@@ -45,5 +45,6 @@ namespace TormentedSouls_bHaptics
             Plugin.tactsuitVr.StopThreads();
         }
     }
+    */
 }
 
