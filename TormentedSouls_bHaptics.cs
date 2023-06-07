@@ -33,7 +33,21 @@ namespace TormentedSouls_bHaptics
     }
     
     [HarmonyPatch(typeof(PlayerController), "OnPlayerDeath")]
-    public class bhaptics_OnPlayerDestroy
+    public class bhaptics_OnPlayerDeath
+    {
+        [HarmonyPostfix]
+        public static void Postfix(float deathDelay)
+        {
+            if (Plugin.tactsuitVr.suitDisabled)
+            {
+                return;
+            }
+            Plugin.tactsuitVr.PlaybackHaptics("Death");
+        }
+    }
+    
+    [HarmonyPatch(typeof(PlayerController), "ReceiveDamage")]
+    public class bhaptics_OnPlayerDamage
     {
         [HarmonyPostfix]
         public static void Postfix()
@@ -42,7 +56,33 @@ namespace TormentedSouls_bHaptics
             {
                 return;
             }
-            Plugin.tactsuitVr.PlaybackHaptics("Death");
+            Plugin.tactsuitVr.PlaybackHaptics("Impact");
+        }
+    }
+
+    [HarmonyPatch(typeof(PlayerSM_Shoot), "StartDamage")]
+    public class bhaptics_PlayerSM_Shoot
+    {
+        [HarmonyPostfix]
+        public static void Postfix(PlayerSM_Shoot __instance)
+        {
+            if (Plugin.tactsuitVr.suitDisabled)
+            {
+                return;
+            }
+            int weaponType = (int)Traverse.Create(__instance).Property("m_weaponBase").GetValue<WeaponBase>().GetWeaponType();
+            if (weaponType == 0)
+            {
+                Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_R");
+                Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_R");
+            }
+            if (weaponType == 1)
+            {
+                Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_R");
+                Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_R");
+                Plugin.tactsuitVr.PlaybackHaptics("RecoilVest_L");
+                Plugin.tactsuitVr.PlaybackHaptics("RecoilArm_L");
+            }
         }
     }
 }
