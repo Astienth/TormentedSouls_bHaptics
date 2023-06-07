@@ -43,6 +43,7 @@ namespace TormentedSouls_bHaptics
                 return;
             }
             Plugin.tactsuitVr.PlaybackHaptics("Death");
+            Plugin.tactsuitVr.StopHeartBeat();
         }
     }
     
@@ -57,6 +58,27 @@ namespace TormentedSouls_bHaptics
                 return;
             }
             Plugin.tactsuitVr.PlaybackHaptics("Impact");
+        }
+    }
+
+    [HarmonyPatch(typeof(PlayerController), "Update")]
+    public class bhaptics_OnPlayerLowHealth
+    {
+        [HarmonyPostfix]
+        public static void Postfix(PlayerController __instance)
+        {
+            if (Plugin.tactsuitVr.suitDisabled)
+            {
+                return;
+            }
+            if(__instance.m_characterData.CurrentHealth < __instance.m_characterData.MaximumHealth / 6)
+            {
+                Plugin.tactsuitVr.StartHeartBeat();
+            }
+            else
+            {
+                Plugin.tactsuitVr.StopHeartBeat();
+            }
         }
     }
 
