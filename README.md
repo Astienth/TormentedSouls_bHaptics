@@ -6,6 +6,8 @@
 
 This mod adds bhaptics (vest, arms and feet) support to the game
 
+☕ If you wanna show some support you can buy me a coffee : https://www.buymeacoffee.com/astienth4
+
 # Effects
 
 Getting damages
